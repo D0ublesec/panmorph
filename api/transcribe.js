@@ -2,17 +2,21 @@
 // This API endpoint handles YouTube audio extraction and music transcription
 
 export default async function handler(req, res) {
-  // Enable CORS for all origins
+  // Handle CORS - must be set before any response
   const origin = req.headers.origin;
+  
+  // Set CORS headers for all responses
   if (origin) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   } else {
     res.setHeader('Access-Control-Allow-Origin', '*');
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
   res.setHeader('Access-Control-Allow-Credentials', 'true');
 
+  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
