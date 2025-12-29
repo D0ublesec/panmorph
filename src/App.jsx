@@ -21,17 +21,20 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeNotes, setActiveNotes] = useState([]);
 
-  const handpanNotes = handpanScales[selectedScale]?.notes || [];
+  const selectedScaleData = handpanScales[selectedScale] || {};
+  const { ding, topNotes = [], bottomNotes = [] } = selectedScaleData;
+  // Combine all notes for mapping purposes
+  const allHandpanNotes = ding ? [ding, ...topNotes, ...bottomNotes] : [...topNotes, ...bottomNotes];
 
   // Update transcribed notes when scale changes
   useEffect(() => {
     if (transcribedNotes.length > 0) {
-      const mapped = mapToHandpanNotes(transcribedNotes, handpanNotes);
+      const mapped = mapToHandpanNotes(transcribedNotes, allHandpanNotes);
       setCurrentNotes(mapped);
     } else {
       setCurrentNotes([]);
     }
-  }, [selectedScale, handpanNotes]);
+  }, [selectedScale, allHandpanNotes]);
 
   const handleNoteClick = async (note) => {
     setActiveNotes([note.note]);
@@ -53,7 +56,7 @@ function App() {
     try {
       const transcription = await transcribeYouTubeAudio(url);
       setTranscribedNotes(transcription.notes);
-      const mapped = mapToHandpanNotes(transcription.notes, handpanNotes);
+      const mapped = mapToHandpanNotes(transcription.notes, allHandpanNotes);
       setCurrentNotes(mapped);
     } catch (error) {
       console.error('Error transcribing audio:', error);
@@ -110,7 +113,9 @@ function App() {
         />
 
         <HandpanVisual
-          notes={handpanNotes}
+          ding={ding}
+          topNotes={topNotes}
+          bottomNotes={bottomNotes}
           onNoteClick={handleNoteClick}
           activeNotes={activeNotes}
         />
@@ -123,7 +128,7 @@ function App() {
           isPlaying={isPlaying}
         />
 
-        <SheetMusic notes={currentNotes} handpanNotes={handpanNotes} />
+        <SheetMusic notes={currentNotes} handpanNotes={allHandpanNotes} />
       </main>
 
       <footer className="app-footer">
