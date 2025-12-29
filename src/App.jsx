@@ -60,7 +60,15 @@ function App() {
       setCurrentNotes(mapped);
     } catch (error) {
       console.error('Error transcribing audio:', error);
-      alert('Error processing YouTube video. Please try again.');
+      let errorMessage = 'Error processing YouTube video. ';
+      
+      if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+        errorMessage += 'The API may need to be redeployed. Please check the API configuration or try again later.';
+      } else {
+        errorMessage += 'Please try again.';
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }

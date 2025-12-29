@@ -87,6 +87,12 @@ export const transcribeYouTubeAudio = async (youtubeUrl) => {
     }
   } catch (error) {
     console.error('API call failed:', error);
+    
+    // Provide more helpful error messages
+    if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
+      throw new Error('CORS error: The API may need to be redeployed. Please check the API configuration.');
+    }
+    
     throw new Error(`Failed to transcribe audio: ${error.message}`);
   }
 };

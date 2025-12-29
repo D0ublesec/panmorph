@@ -1,32 +1,9 @@
 import * as Tone from 'tone';
 
 // Initialize Tone.js audio context
+// Note: AudioContext warnings are suppressed in main.jsx before Tone.js loads
 let initialized = false;
 let initAttempted = false;
-
-// Suppress AudioContext warnings in console - they're expected and harmless
-const originalWarn = console.warn;
-const originalError = console.error;
-console.warn = (...args) => {
-  const message = args[0]?.toString() || '';
-  // Filter out AudioContext warnings - they're expected and harmless
-  if (message.includes('AudioContext') || 
-      message.includes('user gesture') ||
-      message.includes('must be resumed')) {
-    return; // Suppress this warning
-  }
-  originalWarn.apply(console, args);
-};
-console.error = (...args) => {
-  const message = args[0]?.toString() || '';
-  // Filter out AudioContext errors too
-  if (message.includes('AudioContext') || 
-      message.includes('user gesture') ||
-      message.includes('must be resumed')) {
-    return; // Suppress this error
-  }
-  originalError.apply(console, args);
-};
 
 export const initAudio = async () => {
   if (!initialized && !initAttempted) {
