@@ -1,6 +1,8 @@
+# Ignore source files - only serve from dist
 index.html
 src/
 *.jsx
 !dist/
 !api/
+!vercel.json
 
