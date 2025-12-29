@@ -1,8 +1,12 @@
-# Ignore source files - only serve from dist
-index.html
+# Ignore source files - but allow index.html for Vite build
+# Note: index.html is needed for Vite to build, but dist/ will be served
 src/
 *.jsx
 !dist/
 !api/
 !vercel.json
+!index.html
+!vite.config.js
+!package.json
+!package-lock.json
 
