@@ -3,19 +3,31 @@
 
 export default async function handler(req, res) {
   // Handle CORS - must be set before any response
-  const origin = req.headers.origin || req.headers.referer?.split('/').slice(0, 3).join('/') || '*';
+  // Allow all origins for now (you can restrict this later)
+  const allowedOrigins = [
+    'https://handpan.liamdouble.com',
+    'http://localhost:5173',
+    'http://localhost:3000',
+  ];
+  
+  const origin = req.headers.origin;
+  const isAllowedOrigin = !origin || allowedOrigins.includes(origin) || origin.includes('localhost');
   
   // Set CORS headers for all responses
-  res.setHeader('Access-Control-Allow-Origin', origin === '*' ? '*' : origin);
+  if (isAllowedOrigin && origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
   res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Vary', 'Origin');
 
   // Handle preflight OPTIONS request - MUST return 200 with headers
   if (req.method === 'OPTIONS') {
-    return res.status(200).json({});
+    res.status(200).end();
+    return;
   }
 
   if (req.method !== 'POST') {
