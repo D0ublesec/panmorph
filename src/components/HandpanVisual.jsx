@@ -6,25 +6,24 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
 
   const centerX = 200;
   const centerY = 200;
-  // All notes arranged in a circle around the ding, like a real handpan
-  const noteRadius = 130;
+  // Top notes inside the pan, bottom notes outside
+  const topNoteRadius = 120; // Inside the pan
+  const bottomNoteRadius = 170; // Outside the pan
+  const panRadius = 155; // Edge of the pan
   const dingRadius = 35;
 
-  // Combine all notes into one array for display (like handpaner.com)
-  const allNotes = [...topNotes, ...bottomNotes];
-
-  const getNotePosition = (position) => {
+  const getNotePosition = (position, radius) => {
     // Convert position (0-360) to angle in radians
     const angle = ((position - 90) * Math.PI) / 180; // -90 to start at top
-    const x = centerX + noteRadius * Math.cos(angle);
-    const y = centerY + noteRadius * Math.sin(angle);
+    const x = centerX + radius * Math.cos(angle);
+    const y = centerY + radius * Math.sin(angle);
     return { x, y };
   };
 
-  const renderNote = (note, index) => {
-    const { x, y } = getNotePosition(note.position);
+  const renderNote = (note, index, radius, isBottom = false) => {
+    const { x, y } = getNotePosition(note.position, radius);
     const isActive = activeNotes.includes(note.note);
-    const noteKey = `note-${index}`;
+    const noteKey = `${isBottom ? 'bottom' : 'top'}-${index}`;
     const isHovered = hoveredNote === noteKey;
 
     return (
@@ -32,16 +31,19 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
         <circle
           cx={x}
           cy={y}
-          r={isActive ? 20 : isHovered ? 18 : 16}
+          r={isActive ? 18 : isHovered ? 16 : 14}
           fill={
             isActive
               ? '#e74c3c'
               : isHovered
               ? '#3498db'
+              : isBottom
+              ? '#95a5a6' // Different color for bottom notes
               : '#ecf0f1'
           }
-          stroke={isActive ? '#c0392b' : '#bdc3c7'}
+          stroke={isActive ? '#c0392b' : isBottom ? '#7f8c8d' : '#bdc3c7'}
           strokeWidth="2"
+          strokeDasharray={isBottom ? '3,2' : 'none'} // Dashed border for bottom notes
           className="note-circle"
           onClick={() => onNoteClick(note)}
           onMouseEnter={() => setHoveredNote(noteKey)}
@@ -52,7 +54,7 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
           x={x}
           y={y + 5}
           textAnchor="middle"
-          fontSize="11"
+          fontSize={isBottom ? '10' : '11'}
           fill={isActive ? 'white' : '#2c3e50'}
           fontWeight="600"
           pointerEvents="none"
@@ -78,7 +80,7 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
         <circle
           cx={centerX}
           cy={centerY}
-          r={noteRadius + 25}
+          r={panRadius}
           fill="#34495e"
           stroke="#2c3e50"
           strokeWidth="4"
@@ -88,14 +90,17 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
         <circle
           cx={centerX}
           cy={centerY}
-          r={noteRadius + 15}
+          r={panRadius - 5}
           fill="none"
           stroke="#2c3e50"
           strokeWidth="2"
         />
 
-        {/* All notes arranged in a circle around the ding */}
-        {allNotes.map((note, index) => renderNote(note, index))}
+        {/* Top notes - inside the pan */}
+        {topNotes.map((note, index) => renderNote(note, index, topNoteRadius, false))}
+
+        {/* Bottom notes - outside the pan */}
+        {bottomNotes.map((note, index) => renderNote(note, index, bottomNoteRadius, true))}
 
         {/* Ding (center note) - larger and more prominent */}
         {ding && (
