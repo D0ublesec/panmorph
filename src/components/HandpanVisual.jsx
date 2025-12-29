@@ -6,21 +6,25 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
 
   const centerX = 200;
   const centerY = 200;
-  const topRadius = 120;
-  const bottomRadius = 100;
-  const dingRadius = 30;
+  // All notes arranged in a circle around the ding, like a real handpan
+  const noteRadius = 130;
+  const dingRadius = 35;
 
-  const getNotePosition = (position, radius) => {
-    const angle = (position * Math.PI) / 180;
-    const x = centerX + radius * Math.cos(angle);
-    const y = centerY + radius * Math.sin(angle);
+  // Combine all notes into one array for display (like handpaner.com)
+  const allNotes = [...topNotes, ...bottomNotes];
+
+  const getNotePosition = (position) => {
+    // Convert position (0-360) to angle in radians
+    const angle = ((position - 90) * Math.PI) / 180; // -90 to start at top
+    const x = centerX + noteRadius * Math.cos(angle);
+    const y = centerY + noteRadius * Math.sin(angle);
     return { x, y };
   };
 
-  const renderNote = (note, index, radius, isTop) => {
-    const { x, y } = getNotePosition(note.position, radius);
+  const renderNote = (note, index) => {
+    const { x, y } = getNotePosition(note.position);
     const isActive = activeNotes.includes(note.note);
-    const noteKey = `${isTop ? 'top' : 'bottom'}-${index}`;
+    const noteKey = `note-${index}`;
     const isHovered = hoveredNote === noteKey;
 
     return (
@@ -28,7 +32,7 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
         <circle
           cx={x}
           cy={y}
-          r={isActive ? 18 : isHovered ? 16 : 14}
+          r={isActive ? 20 : isHovered ? 18 : 16}
           fill={
             isActive
               ? '#e74c3c'
@@ -46,9 +50,9 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
         />
         <text
           x={x}
-          y={y + 4}
+          y={y + 5}
           textAnchor="middle"
-          fontSize="10"
+          fontSize="11"
           fill={isActive ? 'white' : '#2c3e50'}
           fontWeight="600"
           pointerEvents="none"
@@ -74,19 +78,26 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
         <circle
           cx={centerX}
           cy={centerY}
-          r={topRadius + 30}
-          fill="#2c3e50"
-          stroke="#34495e"
-          strokeWidth="3"
+          r={noteRadius + 25}
+          fill="#34495e"
+          stroke="#2c3e50"
+          strokeWidth="4"
         />
         
-        {/* Top notes circle (outer ring) */}
-        {topNotes.map((note, index) => renderNote(note, index, topRadius, true))}
+        {/* Inner rim */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={noteRadius + 15}
+          fill="none"
+          stroke="#2c3e50"
+          strokeWidth="2"
+        />
 
-        {/* Bottom notes circle (inner ring) */}
-        {bottomNotes.map((note, index) => renderNote(note, index, bottomRadius, false))}
+        {/* All notes arranged in a circle around the ding */}
+        {allNotes.map((note, index) => renderNote(note, index))}
 
-        {/* Ding (center note) */}
+        {/* Ding (center note) - larger and more prominent */}
         {ding && (
           <g>
             <circle
@@ -110,9 +121,9 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
             />
             <text
               x={centerX}
-              y={centerY + 6}
+              y={centerY + 7}
               textAnchor="middle"
-              fontSize="14"
+              fontSize="16"
               fill={isDingActive ? 'white' : '#2c3e50'}
               fontWeight="700"
               pointerEvents="none"
@@ -121,9 +132,9 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
             </text>
             <text
               x={centerX}
-              y={centerY - 15}
+              y={centerY - 18}
               textAnchor="middle"
-              fontSize="9"
+              fontSize="10"
               fill={isDingActive ? 'white' : '#7f8c8d'}
               fontWeight="500"
               pointerEvents="none"

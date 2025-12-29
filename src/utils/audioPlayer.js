@@ -11,61 +11,120 @@ export const initAudio = async () => {
 };
 
 // Play a note at a specific frequency with handpan-like sound
-export const playNote = async (frequency, duration = 0.5) => {
+// Handpans have a warm, bell-like metallic sound - not snare-like
+export const playNote = async (frequency, duration = 1.0) => {
   await initAudio();
   
   try {
-    // Use MetalSynth for a more handpan-like metallic sound
-    const synth = new Tone.MetalSynth({
+    // Use a combination of oscillators to create a handpan-like sound
+    // Handpans have a rich harmonic content with a warm, resonant quality
+    const reverb = new Tone.Reverb({
+      roomSize: 0.8,
+      damping: 0.3,
+      wet: 0.4,
+    }).toDestination();
+
+    // Create a handpan-like sound using multiple oscillators
+    // Main oscillator - sine wave for the fundamental
+    const mainOsc = new Tone.Oscillator({
       frequency: frequency,
-      envelope: {
-        attack: 0.001,
-        decay: 0.1,
-        sustain: 0.1,
-        release: 0.5,
-      },
-      harmonicity: 5.1,
-      modulationIndex: 32,
-      resonance: 4000,
-      octaves: 1.5,
+      type: 'sine',
     });
 
-    // Add reverb for more realistic handpan sound
-    const reverb = new Tone.Reverb({
-      roomSize: 0.5,
-      damping: 0.2,
-      wet: 0.3,
-    }).toDestination();
-    
-    synth.connect(reverb);
+    // Harmonic oscillator - adds warmth and richness
+    const harmonicOsc = new Tone.Oscillator({
+      frequency: frequency * 2.01, // Slightly detuned for warmth
+      type: 'sine',
+      volume: -8, // Quieter harmonic
+    });
 
-    synth.triggerAttackRelease(frequency, duration);
-    
-    // Clean up after note finishes
+    // Envelope for natural attack and decay
+    const envelope = new Tone.AmplitudeEnvelope({
+      attack: 0.01,
+      decay: 0.3,
+      sustain: 0.2,
+      release: 1.5,
+    }).connect(reverb);
+
+    // Low-pass filter for warmth
+    const filter = new Tone.Filter({
+      frequency: frequency * 4,
+      type: 'lowpass',
+      Q: 1,
+    }).connect(envelope);
+
+    mainOsc.connect(filter);
+    harmonicOsc.connect(filter);
+
+    // Start oscillators
+    mainOsc.start();
+    harmonicOsc.start();
+
+    // Trigger envelope
+    envelope.triggerAttackRelease(duration);
+
+    // Stop and clean up
     setTimeout(() => {
-      synth.dispose();
+      mainOsc.stop();
+      harmonicOsc.stop();
+      mainOsc.dispose();
+      harmonicOsc.dispose();
+      filter.dispose();
+      envelope.dispose();
       reverb.dispose();
-    }, duration * 1000 + 500);
+    }, duration * 1000 + 2000);
   } catch (error) {
-    // Fallback to basic synth if MetalSynth is not available
-    console.warn('MetalSynth not available, using basic synth:', error);
-    const synth = new Tone.Synth({
-      oscillator: {
-        type: 'sine',
-      },
-      envelope: {
-        attack: 0.01,
-        decay: 0.2,
-        sustain: 0.2,
-        release: 0.8,
-      },
-    }).toDestination();
+    // Fallback to MembraneSynth which is better for handpan-like sounds
+    console.warn('Oscillator setup failed, using MembraneSynth:', error);
+    try {
+      const synth = new Tone.MembraneSynth({
+        pitchDecay: 0.05,
+        octaves: 2,
+        oscillator: {
+          type: 'sine',
+        },
+        envelope: {
+          attack: 0.001,
+          decay: 0.4,
+          sustain: 0.01,
+          release: 1.4,
+        },
+      });
 
-    synth.triggerAttackRelease(frequency, duration);
-    
-    setTimeout(() => {
-      synth.dispose();
-    }, duration * 1000 + 100);
+      const reverb = new Tone.Reverb({
+        roomSize: 0.7,
+        damping: 0.2,
+        wet: 0.3,
+      }).toDestination();
+
+      synth.connect(reverb);
+      synth.triggerAttackRelease(frequency, duration);
+      
+      setTimeout(() => {
+        synth.dispose();
+        reverb.dispose();
+      }, duration * 1000 + 1500);
+    } catch (fallbackError) {
+      // Final fallback to basic synth
+      console.warn('MembraneSynth failed, using basic synth:', fallbackError);
+      const synth = new Tone.Synth({
+        oscillator: {
+          type: 'sine',
+        },
+        envelope: {
+          attack: 0.01,
+          decay: 0.4,
+          sustain: 0.1,
+          release: 1.2,
+        },
+      }).toDestination();
+
+      synth.triggerAttackRelease(frequency, duration);
+      
+      setTimeout(() => {
+        synth.dispose();
+      }, duration * 1000 + 1500);
+    }
   }
 };
 
