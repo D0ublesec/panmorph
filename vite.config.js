@@ -7,7 +7,7 @@ import react from '@vitejs/plugin-react'
 // For project pages (username.github.io/repo-name), use '/repo-name/'
 export default defineConfig({
   plugins: [react()],
-  // Change this to your repository name for GitHub Pages
-  base: process.env.NODE_ENV === 'production' ? '/panmorph' : '/',
+  // Root domain deployment - use '/' for production
+  base: '/',
 })
 
