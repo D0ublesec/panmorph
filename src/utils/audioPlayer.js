@@ -4,15 +4,28 @@ import * as Tone from 'tone';
 let initialized = false;
 let initAttempted = false;
 
-// Suppress AudioContext warnings in console
+// Suppress AudioContext warnings in console - they're expected and harmless
 const originalWarn = console.warn;
+const originalError = console.error;
 console.warn = (...args) => {
   const message = args[0]?.toString() || '';
   // Filter out AudioContext warnings - they're expected and harmless
-  if (message.includes('AudioContext') && message.includes('user gesture')) {
+  if (message.includes('AudioContext') || 
+      message.includes('user gesture') ||
+      message.includes('must be resumed')) {
     return; // Suppress this warning
   }
   originalWarn.apply(console, args);
+};
+console.error = (...args) => {
+  const message = args[0]?.toString() || '';
+  // Filter out AudioContext errors too
+  if (message.includes('AudioContext') || 
+      message.includes('user gesture') ||
+      message.includes('must be resumed')) {
+    return; // Suppress this error
+  }
+  originalError.apply(console, args);
 };
 
 export const initAudio = async () => {
@@ -34,86 +47,50 @@ export const initAudio = async () => {
 
 // Play a note at a specific frequency with handpan-like sound
 // Handpans have a warm, bell-like metallic sound with rich harmonics
-// Based on handpaner.com approach - using tuned oscillators with proper harmonics
-export const playNote = async (frequency, duration = 1.2) => {
+export const playNote = async (frequency, duration = 0.8) => {
   await initAudio();
   
   try {
-    // Handpan sound characteristics:
-    // - Strong fundamental (sine wave)
-    // - Rich harmonics (especially 2nd and 3rd harmonics)
-    // - Slight inharmonicity for warmth
-    // - Long decay with reverb
-    
+    // Use FMSynth for better handpan-like sound - cleaner and more realistic
+    const synth = new Tone.FMSynth({
+      harmonicity: 2.5,
+      modulationIndex: 2.5,
+      detune: 0,
+      oscillator: {
+        type: 'sine',
+      },
+      envelope: {
+        attack: 0.01,
+        decay: 0.15,
+        sustain: 0.1,
+        release: 0.6, // Shorter release - ~1 second total
+      },
+      modulation: {
+        type: 'sine',
+      },
+      modulationEnvelope: {
+        attack: 0.01,
+        decay: 0.1,
+        sustain: 0.05,
+        release: 0.3,
+      },
+    });
+
+    // Light reverb for resonance
     const reverb = new Tone.Reverb({
-      roomSize: 0.9,
-      damping: 0.2,
-      wet: 0.35,
+      roomSize: 0.6,
+      damping: 0.4,
+      wet: 0.2, // Less reverb for cleaner sound
     }).toDestination();
 
-    // Create a gain node to mix the oscillators
-    const gainNode = new Tone.Gain(0.5).connect(reverb);
-
-    // Fundamental frequency (main tone)
-    const fundamental = new Tone.Oscillator({
-      frequency: frequency,
-      type: 'sine',
-      volume: 0,
-    }).connect(gainNode);
-
-    // Second harmonic (octave) - adds brightness
-    const harmonic2 = new Tone.Oscillator({
-      frequency: frequency * 2,
-      type: 'sine',
-      volume: -12, // Quieter than fundamental
-    }).connect(gainNode);
-
-    // Third harmonic - adds warmth
-    const harmonic3 = new Tone.Oscillator({
-      frequency: frequency * 3,
-      type: 'sine',
-      volume: -18, // Even quieter
-    }).connect(gainNode);
-
-    // Slight detuning for warmth (like real handpans)
-    const detuned = new Tone.Oscillator({
-      frequency: frequency * 1.005, // Very slight detune
-      type: 'sine',
-      volume: -20,
-    }).connect(gainNode);
-
-    // Envelope for natural attack and long decay
-    const envelope = new Tone.AmplitudeEnvelope({
-      attack: 0.005,
-      decay: 0.2,
-      sustain: 0.15,
-      release: 2.0, // Long release for handpan sustain
-    }).connect(gainNode);
-
-    // Start all oscillators
-    fundamental.start();
-    harmonic2.start();
-    harmonic3.start();
-    detuned.start();
-
-    // Trigger the envelope
-    envelope.triggerAttackRelease(duration);
-
-    // Stop and clean up after note finishes
-    const cleanupTime = (duration + 2.5) * 1000;
+    synth.connect(reverb);
+    synth.triggerAttackRelease(frequency, duration);
+    
+    // Clean up after note finishes (duration + release time)
     setTimeout(() => {
-      fundamental.stop();
-      harmonic2.stop();
-      harmonic3.stop();
-      detuned.stop();
-      fundamental.dispose();
-      harmonic2.dispose();
-      harmonic3.dispose();
-      detuned.dispose();
-      gainNode.dispose();
-      envelope.dispose();
+      synth.dispose();
       reverb.dispose();
-    }, cleanupTime);
+    }, (duration + 0.7) * 1000);
   } catch (error) {
     // Fallback: Use a simpler but still handpan-like approach
     console.warn('Multi-oscillator setup failed, using simplified synth:', error);
@@ -155,7 +132,7 @@ export const playNote = async (frequency, duration = 1.2) => {
       setTimeout(() => {
         synth.dispose();
         reverb.dispose();
-      }, duration * 1000 + 2000);
+      }, (duration + 0.7) * 1000);
     } catch (fallbackError) {
       // Final fallback - basic but clean
       console.warn('FMSynth failed, using basic synth:', fallbackError);
@@ -165,16 +142,16 @@ export const playNote = async (frequency, duration = 1.2) => {
         },
         envelope: {
           attack: 0.01,
-          decay: 0.5,
+          decay: 0.2,
           sustain: 0.1,
-          release: 1.5,
+          release: 0.5, // Shorter release
         },
       });
 
       const reverb = new Tone.Reverb({
-        roomSize: 0.7,
-        damping: 0.3,
-        wet: 0.25,
+        roomSize: 0.6,
+        damping: 0.4,
+        wet: 0.2,
       }).toDestination();
 
       synth.connect(reverb);
@@ -183,7 +160,7 @@ export const playNote = async (frequency, duration = 1.2) => {
       setTimeout(() => {
         synth.dispose();
         reverb.dispose();
-      }, duration * 1000 + 1800);
+      }, (duration + 0.6) * 1000);
     }
   }
 };

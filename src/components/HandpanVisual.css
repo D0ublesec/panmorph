@@ -10,14 +10,32 @@
   max-width: 100%;
   height: auto;
   filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+  user-select: none; /* Prevent text selection when clicking */
 }
 
 .note-circle {
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .note-circle:hover {
+  transform: scale(1.15);
+  filter: brightness(1.1);
+}
+
+.ding-circle {
+  cursor: pointer;
+}
+
+.ding-circle:hover {
   transform: scale(1.1);
+  filter: brightness(1.1);
+}
+
+@media (max-width: 1024px) {
+  .handpan-svg {
+    max-width: 500px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -27,7 +45,7 @@
   
   .handpan-svg {
     width: 100%;
-    max-width: 350px;
+    max-width: 400px;
   }
 }
 

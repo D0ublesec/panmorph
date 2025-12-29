@@ -38,8 +38,8 @@ function App() {
 
   const handleNoteClick = async (note) => {
     setActiveNotes([note.note]);
-    await playNote(note.frequency);
-    setTimeout(() => setActiveNotes([]), 300);
+    await playNote(note.frequency, 0.8); // ~1 second duration
+    setTimeout(() => setActiveNotes([]), 800);
   };
 
   const handleScaleChange = (scaleKey) => {
@@ -82,10 +82,10 @@ function App() {
 
       setTimeout(() => {
         setActiveNotes([note.note]);
-        playNote(note.frequency, 0.5);
+        playNote(note.frequency, 0.8); // ~1 second duration
         setTimeout(() => {
           setActiveNotes((prev) => prev.filter((n) => n !== note.note));
-        }, 500);
+        }, 800);
       }, delay);
     }
 

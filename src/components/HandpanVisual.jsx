@@ -4,13 +4,15 @@ import './HandpanVisual.css';
 const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, activeNotes = [] }) => {
   const [hoveredNote, setHoveredNote] = useState(null);
 
-  const centerX = 200;
-  const centerY = 200;
+  // Make handpan larger for easier clicking
+  const scale = 1.5; // Scale up by 50%
+  const centerX = 300;
+  const centerY = 300;
   // Top notes inside the pan, bottom notes outside
-  const topNoteRadius = 120; // Inside the pan
-  const bottomNoteRadius = 170; // Outside the pan
-  const panRadius = 155; // Edge of the pan
-  const dingRadius = 35;
+  const topNoteRadius = 180; // Inside the pan (120 * 1.5)
+  const bottomNoteRadius = 255; // Outside the pan (170 * 1.5)
+  const panRadius = 232; // Edge of the pan (155 * 1.5)
+  const dingRadius = 52; // (35 * 1.5)
 
   const getNotePosition = (position, radius) => {
     // Convert position (0-360) to angle in radians
@@ -31,7 +33,7 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
         <circle
           cx={x}
           cy={y}
-          r={isActive ? 18 : isHovered ? 16 : 14}
+          r={isActive ? 28 : isHovered ? 26 : 24} // Larger for easier clicking
           fill={
             isActive
               ? '#e74c3c'
@@ -42,8 +44,8 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
               : '#ecf0f1'
           }
           stroke={isActive ? '#c0392b' : isBottom ? '#7f8c8d' : '#bdc3c7'}
-          strokeWidth="2"
-          strokeDasharray={isBottom ? '3,2' : 'none'} // Dashed border for bottom notes
+          strokeWidth="3"
+          strokeDasharray={isBottom ? '4,3' : 'none'} // Dashed border for bottom notes
           className="note-circle"
           onClick={() => onNoteClick(note)}
           onMouseEnter={() => setHoveredNote(noteKey)}
@@ -52,9 +54,9 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
         />
         <text
           x={x}
-          y={y + 5}
+          y={y + 7}
           textAnchor="middle"
-          fontSize={isBottom ? '10' : '11'}
+          fontSize={isBottom ? '14' : '16'} // Larger text
           fill={isActive ? 'white' : '#2c3e50'}
           fontWeight="600"
           pointerEvents="none"
@@ -71,9 +73,9 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
   return (
     <div className="handpan-container">
       <svg
-        width="400"
-        height="400"
-        viewBox="0 0 400 400"
+        width="600"
+        height="600"
+        viewBox="0 0 600 600"
         className="handpan-svg"
       >
         {/* Outer circle (handpan body) */}
@@ -83,17 +85,17 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
           r={panRadius}
           fill="#34495e"
           stroke="#2c3e50"
-          strokeWidth="4"
+          strokeWidth="6"
         />
         
         {/* Inner rim */}
         <circle
           cx={centerX}
           cy={centerY}
-          r={panRadius - 5}
+          r={panRadius - 8}
           fill="none"
           stroke="#2c3e50"
-          strokeWidth="2"
+          strokeWidth="3"
         />
 
         {/* Top notes - inside the pan */}
@@ -117,7 +119,7 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
                   : '#f39c12'
               }
               stroke={isDingActive ? '#c0392b' : '#d68910'}
-              strokeWidth="3"
+              strokeWidth="4"
               className="note-circle ding-circle"
               onClick={() => onNoteClick(ding)}
               onMouseEnter={() => setHoveredNote('ding')}
@@ -126,9 +128,9 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
             />
             <text
               x={centerX}
-              y={centerY + 7}
+              y={centerY + 10}
               textAnchor="middle"
-              fontSize="16"
+              fontSize="24" // Larger text
               fill={isDingActive ? 'white' : '#2c3e50'}
               fontWeight="700"
               pointerEvents="none"
@@ -137,9 +139,9 @@ const HandpanVisual = ({ ding, topNotes = [], bottomNotes = [], onNoteClick, act
             </text>
             <text
               x={centerX}
-              y={centerY - 18}
+              y={centerY - 25}
               textAnchor="middle"
-              fontSize="10"
+              fontSize="14" // Larger text
               fill={isDingActive ? 'white' : '#7f8c8d'}
               fontWeight="500"
               pointerEvents="none"
