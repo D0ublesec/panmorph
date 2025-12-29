@@ -1,6 +1,7 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "framework": "vite",
   "functions": {
     "api/transcribe.js": {
       "maxDuration": 60
@@ -10,6 +11,10 @@
     {
       "source": "/api/transcribe",
       "destination": "/api/transcribe.js"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
