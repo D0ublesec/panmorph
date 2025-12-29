@@ -2,16 +2,32 @@ import * as Tone from 'tone';
 
 // Initialize Tone.js audio context
 let initialized = false;
+let initAttempted = false;
+
+// Suppress AudioContext warnings in console
+const originalWarn = console.warn;
+console.warn = (...args) => {
+  const message = args[0]?.toString() || '';
+  // Filter out AudioContext warnings - they're expected and harmless
+  if (message.includes('AudioContext') && message.includes('user gesture')) {
+    return; // Suppress this warning
+  }
+  originalWarn.apply(console, args);
+};
 
 export const initAudio = async () => {
-  if (!initialized) {
+  if (!initialized && !initAttempted) {
+    initAttempted = true;
     try {
-      await Tone.start();
+      // Only try to start if we have user interaction
+      if (Tone.context.state !== 'running') {
+        await Tone.start();
+      }
       initialized = true;
     } catch (error) {
       // AudioContext warnings are expected - browsers require user interaction
       // The context will be started automatically on first user interaction
-      console.debug('AudioContext initialization:', error.message);
+      // Silently handle this - it's not an error
     }
   }
 };

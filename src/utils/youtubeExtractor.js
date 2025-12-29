@@ -60,8 +60,11 @@ export const transcribeYouTubeAudio = async (youtubeUrl) => {
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
+      mode: 'cors',
+      credentials: 'omit',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
       body: JSON.stringify({ youtubeUrl }),
     });
