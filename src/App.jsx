@@ -101,42 +101,38 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🎵 Handpan Music Transcriber</h1>
-        <p>Convert any YouTube song to handpan notes</p>
+        <h1>Handpan Player</h1>
+        <p className="subtitle">Play, explore, and transcribe music</p>
       </header>
 
       <main className="app-main">
-        <HandpanSelector
-          selectedScale={selectedScale}
-          onScaleChange={handleScaleChange}
-          scales={handpanScales}
-        />
+        <div className="handpan-section">
+          <HandpanSelector
+            selectedScale={selectedScale}
+            onScaleChange={handleScaleChange}
+            scales={handpanScales}
+          />
 
-        <HandpanVisual
-          ding={ding}
-          topNotes={topNotes}
-          bottomNotes={bottomNotes}
-          onNoteClick={handleNoteClick}
-          activeNotes={activeNotes}
-        />
+          <HandpanVisual
+            ding={ding}
+            topNotes={topNotes}
+            bottomNotes={bottomNotes}
+            onNoteClick={handleNoteClick}
+            activeNotes={activeNotes}
+          />
 
-        <YouTubeSearch onSearch={handleYouTubeSearch} isLoading={isLoading} />
+          <AutoPlayButton
+            onClick={handleAutoPlay}
+            disabled={currentNotes.length === 0 || isPlaying}
+            isPlaying={isPlaying}
+          />
+        </div>
 
-        <AutoPlayButton
-          onClick={handleAutoPlay}
-          disabled={currentNotes.length === 0 || isPlaying}
-          isPlaying={isPlaying}
-        />
-
-        <SheetMusic notes={currentNotes} handpanNotes={allHandpanNotes} />
+        <div className="transcription-section">
+          <YouTubeSearch onSearch={handleYouTubeSearch} isLoading={isLoading} />
+          <SheetMusic notes={currentNotes} handpanNotes={allHandpanNotes} />
+        </div>
       </main>
-
-      <footer className="app-footer">
-        <p>
-          Click on the handpan notes to play them, or search for a YouTube video
-          to get the notes for any song!
-        </p>
-      </footer>
     </div>
   );
 }

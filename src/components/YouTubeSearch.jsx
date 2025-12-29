@@ -13,12 +13,13 @@ const YouTubeSearch = ({ onSearch, isLoading }) => {
 
   return (
     <div className="youtube-search">
+      <h3>🎵 Transcribe from YouTube</h3>
       <form onSubmit={handleSubmit} className="search-form">
         <input
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Enter YouTube URL..."
+          placeholder="https://youtube.com/watch?v=..."
           className="search-input"
           disabled={isLoading}
         />
@@ -27,11 +28,11 @@ const YouTubeSearch = ({ onSearch, isLoading }) => {
           className="search-button"
           disabled={isLoading || !url.trim()}
         >
-          {isLoading ? 'Processing...' : 'Transcribe'}
+          {isLoading ? '⏳ Processing...' : '🎼 Transcribe'}
         </button>
       </form>
       <p className="search-hint">
-        Paste a YouTube URL to convert the song to handpan notes
+        Paste any YouTube URL to automatically extract and convert the music to handpan notes
       </p>
     </div>
   );
