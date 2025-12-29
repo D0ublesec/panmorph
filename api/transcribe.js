@@ -2,31 +2,21 @@
 // This API endpoint handles YouTube audio extraction and music transcription
 
 export default async function handler(req, res) {
-  // Handle CORS - must be set before any response
-  // Allow all origins for now (you can restrict this later)
-  const allowedOrigins = [
-    'https://handpan.liamdouble.com',
-    'http://localhost:5173',
-    'http://localhost:3000',
-  ];
+  // Handle CORS - Set headers IMMEDIATELY for all requests
+  const origin = req.headers.origin || req.headers.referer?.match(/^https?:\/\/[^/]+/)?.[0] || '*';
   
-  const origin = req.headers.origin;
-  const isAllowedOrigin = !origin || allowedOrigins.includes(origin) || origin.includes('localhost');
-  
-  // Set CORS headers for all responses
-  if (isAllowedOrigin && origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
-  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
+  // Set CORS headers - these must be set for ALL responses
+  res.setHeader('Access-Control-Allow-Origin', origin === '*' ? '*' : origin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, HEAD');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.setHeader('Access-Control-Max-Age', '86400');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Vary', 'Origin');
 
-  // Handle preflight OPTIONS request - MUST return 200 with headers
+  // Handle preflight OPTIONS request - return immediately with 200
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    res.writeHead(200);
+    res.end();
     return;
   }
 
