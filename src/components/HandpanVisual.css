@@ -1,0 +1,33 @@
+.handpan-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.handpan-svg {
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+}
+
+.note-circle {
+  transition: all 0.2s ease;
+}
+
+.note-circle:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .handpan-container {
+    padding: 10px;
+  }
+  
+  .handpan-svg {
+    width: 100%;
+    max-width: 350px;
+  }
+}
+

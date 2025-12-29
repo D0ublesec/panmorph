@@ -1,0 +1,36 @@
+.handpan-selector {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.handpan-selector label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: white;
+  font-size: 1.1rem;
+}
+
+.scale-select {
+  padding: 12px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+.scale-select:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: white;
+}
+
+.scale-select:focus {
+  outline: none;
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
