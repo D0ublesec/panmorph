@@ -2,22 +2,20 @@
 // This API endpoint handles YouTube audio extraction and music transcription
 
 export default async function handler(req, res) {
-  // Handle CORS - Set headers IMMEDIATELY for all requests
-  const origin = req.headers.origin || req.headers.referer?.match(/^https?:\/\/[^/]+/)?.[0] || '*';
+  // Handle CORS FIRST - before ANY other code
+  // Get origin from request
+  const origin = req.headers.origin;
   
-  // Set CORS headers - these must be set for ALL responses
-  res.setHeader('Access-Control-Allow-Origin', origin === '*' ? '*' : origin);
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, HEAD');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  // Set CORS headers for ALL responses
+  res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
   res.setHeader('Access-Control-Max-Age', '86400');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Vary', 'Origin');
 
-  // Handle preflight OPTIONS request - return immediately with 200
+  // CRITICAL: Handle OPTIONS preflight request FIRST
   if (req.method === 'OPTIONS') {
-    res.writeHead(200);
-    res.end();
-    return;
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
