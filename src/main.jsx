@@ -6,14 +6,16 @@ const originalLog = console.log;
 
 const shouldSuppress = (message) => {
   if (typeof message !== 'string') return false;
-  return message.includes('AudioContext') || 
-         message.includes('user gesture') ||
-         message.includes('must be resumed') ||
-         message.includes('must be created') ||
-         message.includes('autoplay');
+  const msg = message.toLowerCase();
+  return msg.includes('audiocontext') || 
+         msg.includes('user gesture') ||
+         msg.includes('must be resumed') ||
+         msg.includes('must be created') ||
+         msg.includes('autoplay') ||
+         msg.includes('tone.js v');
 };
 
-console.warn = (...args) => {
+console.warn = function(...args) {
   const message = args[0]?.toString() || '';
   if (shouldSuppress(message)) {
     return; // Suppress AudioContext warnings
@@ -21,7 +23,7 @@ console.warn = (...args) => {
   originalWarn.apply(console, args);
 };
 
-console.error = (...args) => {
+console.error = function(...args) {
   const message = args[0]?.toString() || '';
   if (shouldSuppress(message)) {
     return; // Suppress AudioContext errors
@@ -29,10 +31,10 @@ console.error = (...args) => {
   originalError.apply(console, args);
 };
 
-console.log = (...args) => {
+console.log = function(...args) {
   const message = args[0]?.toString() || '';
   // Suppress Tone.js version log and AudioContext logs
-  if (shouldSuppress(message) || message.includes('Tone.js v')) {
+  if (shouldSuppress(message)) {
     return;
   }
   originalLog.apply(console, args);
