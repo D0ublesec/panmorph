@@ -27,6 +27,24 @@
           "value": "Content-Type"
         }
       ]
+    },
+    {
+      "source": "/(.*\\.jsx)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/javascript"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.js)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/javascript"
+        }
+      ]
     }
   ]
 }
